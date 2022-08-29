@@ -20,14 +20,14 @@ namespace TestApp2.Controllers
             _context = context;
         }
 
-        // GET: Task
+
         public async Task<IActionResult> Index()
         {
             var mainContext = _context.Tasks.Include(t => t.TaskCreater).Include(t => t.TaskWorker);
             return View(await mainContext.ToListAsync());
         }
 
-        // GET: Task/Details/5
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Tasks == null)
@@ -47,7 +47,7 @@ namespace TestApp2.Controllers
             return View(task);
         }
 
-        // GET: Task/Create
+
         public IActionResult Create()
         {
             ViewData["TaskCreaterID"] = new SelectList(_context.Users, "UserID", "Name");
@@ -55,9 +55,7 @@ namespace TestApp2.Controllers
             return View();
         }
 
-        // POST: Task/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TaskID,Name,Description,CreatedDate,UpdatedDate,TaskStatus,TaskCreaterID,TaskWorkerID")] Task task)
@@ -70,7 +68,7 @@ namespace TestApp2.Controllers
             return View(task);
         }
 
-        // GET: Task/Edit/5
+        
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Tasks == null)
@@ -88,9 +86,8 @@ namespace TestApp2.Controllers
             return View(task);
         }
 
-        // POST: Task/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TaskID,Name,Description,CreatedDate,UpdatedDate,TaskStatus,TaskCreaterID,TaskWorkerID")] Task task)
@@ -115,14 +112,70 @@ namespace TestApp2.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+            
+            return RedirectToAction(nameof(Index));
        
-            ViewData["TaskCreaterID"] = new SelectList(_context.Users, "UserID", "Name", task.TaskCreaterID);
             ViewData["TaskWorkerID"] = new SelectList(_context.Users, "UserID", "Name", task.TaskWorkerID);
             return View(task);
         }
 
-        // GET: Task/Delete/5
+
+        public async Task<IActionResult> ChangeTaskStatus(int? id)
+        {
+            if (id == null || _context.Tasks == null)
+            {
+                return NotFound();
+            }
+
+            var task = await _context.Tasks.FindAsync(id);
+            if (task == null)
+            {
+                return NotFound();
+            }
+            
+            return View(task);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeTaskStatus(int id, [Bind("TaskID,TaskStatus")] Task task)
+        {
+            var temp = await _context.Tasks.FirstOrDefaultAsync(t => t.TaskID == task.TaskID);
+            temp.TaskStatus = task.TaskStatus;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+    
+
+        public async Task<IActionResult> ChangeTaskCreater(int? id)
+        {
+            if (id == null || _context.Tasks == null)
+            {
+                return NotFound();
+            }
+
+            var task = await _context.Tasks.FindAsync(id);
+            if (task == null)
+            {
+                return NotFound();
+            }
+            ViewData["TaskCreaterID"] = new SelectList(_context.Users, "UserID", "Name", task.TaskCreaterID);
+
+            return View(task);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeTaskCreater([Bind("TaskID,TaskCreaterID")] Task task)
+        {
+            var temp = await _context.Tasks.FirstOrDefaultAsync(t => t.TaskID == task.TaskID);
+            temp.TaskCreaterID = task.TaskCreaterID;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Tasks == null)
@@ -142,7 +195,7 @@ namespace TestApp2.Controllers
             return View(task);
         }
 
-        // POST: Task/Delete/5
+      
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

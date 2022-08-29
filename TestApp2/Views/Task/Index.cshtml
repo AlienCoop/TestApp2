@@ -55,15 +55,18 @@
                 @Html.DisplayFor(modelItem => item.TaskStatus)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TaskCreater.UserID)
+               @(item.TaskCreater.Name + " " + item.TaskCreater.Surname)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TaskWorker.UserID)
+                @(item.TaskWorker.Name + " " + item.TaskCreater.Surname)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.TaskID">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.TaskID">Details</a> |
+                <a asp-action="ChangeTaskStatus" asp-route-id="@item.TaskID">Change Task Status</a> |
+                <a asp-action="ChangeTaskCreater" asp-route-id="@item.TaskID">Change Task Creater</a> |
                 <a asp-action="Delete" asp-route-id="@item.TaskID">Delete</a>
+
             </td>
         </tr>
 }

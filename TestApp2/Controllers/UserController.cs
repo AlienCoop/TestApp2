@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using TestApp2.DAL;
 using TestApp2.Models;
 
+// допилить добавление, убрать дату модификации и создания 
 namespace TestApp2.Controllers
 {
     public class UserController : Controller
@@ -19,7 +20,7 @@ namespace TestApp2.Controllers
             _context = context;
         }
 
-        // GET: User
+
         public async Task<IActionResult> Index(
     string sortOrder,
     string currentFilter,
@@ -69,18 +70,6 @@ namespace TestApp2.Controllers
         }
 
 
-
-
-
-
-        //public async Task<IActionResult> Index()
-        //{
-        //    return _context.Users != null ?
-        //                View(await _context.Users.ToListAsync()) :
-        //                Problem("Entity set 'MainContext.Users'  is null.");
-        //}
-
-        // GET: User/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Users == null)
@@ -98,15 +87,13 @@ namespace TestApp2.Controllers
             return View(user);
         }
 
-        // GET: User/Create
+        
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: User/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UserID,Name,Surname,DateOfCreation,DateOfModification,Status")] User user)
@@ -119,7 +106,7 @@ namespace TestApp2.Controllers
             return View(user);
         }
 
-        // GET: User/Edit/5
+        
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Users == null)
@@ -136,9 +123,7 @@ namespace TestApp2.Controllers
             return View(user);
         }
 
-        // POST: User/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("UserID,Name,Surname,DateOfCreation,DateOfModification,Status")] User user)
@@ -169,7 +154,7 @@ namespace TestApp2.Controllers
             return View(user);
         }
 
-        // GET: User/Delete/5
+        
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Users == null)
@@ -187,7 +172,6 @@ namespace TestApp2.Controllers
             return View(user);
         }
 
-        // POST: User/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
