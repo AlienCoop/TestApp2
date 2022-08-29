@@ -1,25 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TestApp2.DAL;
+using TestApp2.Interfaces;
 
 namespace TestApp2.DAL
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddAppContext(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddMainContext(this IServiceCollection services, IConfiguration config)
         {
-            var connectionString = config.GetConnectionString("cs");
+            var connectionString = config.GetConnectionString("DefaultConnection");
 
             services.AddDbContext<MainContext>(options =>
             {
-                options.UseSqlServer(connectionString);
+                options.UseNpgsql(connectionString);
             });
 
-            services.AddScoped<MainContext>(serviceProvider =>
+            services.AddScoped<IMainDbContext>(serviceProvider =>
             {
-                var context = serviceProvider.GetRequiredService<MainContext>();
+                var context = serviceProvider.GetService<MainContext>();
                 try
                 {
-                    DbInitializer.Initialize(context);
+                    context.Database.EnsureCreated();
                 }
                 catch { }
                 return context;
