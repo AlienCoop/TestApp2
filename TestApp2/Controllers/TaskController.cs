@@ -50,8 +50,8 @@ namespace TestApp2.Controllers
         // GET: Task/Create
         public IActionResult Create()
         {
-            ViewData["TaskCreaterID"] = new SelectList(_context.Users, "UserID", "UserID");
-            ViewData["TaskWorkerID"] = new SelectList(_context.Users, "UserID", "UserID");
+            ViewData["TaskCreaterID"] = new SelectList(_context.Users, "UserID", "Name");
+            ViewData["TaskWorkerID"] = new SelectList(_context.Users, "UserID", "Name");
             return View();
         }
 
@@ -62,14 +62,11 @@ namespace TestApp2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TaskID,Name,Description,CreatedDate,UpdatedDate,TaskStatus,TaskCreaterID,TaskWorkerID")] Task task)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(task);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["TaskCreaterID"] = new SelectList(_context.Users, "UserID", "UserID", task.TaskCreaterID);
-            ViewData["TaskWorkerID"] = new SelectList(_context.Users, "UserID", "UserID", task.TaskWorkerID);
+            _context.Add(task);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+            ViewData["TaskCreaterID"] = new SelectList(_context.Users, "UserID", "Name", task.TaskCreaterID);
+            ViewData["TaskWorkerID"] = new SelectList(_context.Users, "UserID", "Name", task.TaskWorkerID);
             return View(task);
         }
 
@@ -86,8 +83,8 @@ namespace TestApp2.Controllers
             {
                 return NotFound();
             }
-            ViewData["TaskCreaterID"] = new SelectList(_context.Users, "UserID", "UserID", task.TaskCreaterID);
-            ViewData["TaskWorkerID"] = new SelectList(_context.Users, "UserID", "UserID", task.TaskWorkerID);
+            ViewData["TaskCreaterID"] = new SelectList(_context.Users, "UserID", "Name", task.TaskCreaterID);
+            ViewData["TaskWorkerID"] = new SelectList(_context.Users, "UserID", "Name", task.TaskWorkerID);
             return View(task);
         }
 
@@ -102,9 +99,6 @@ namespace TestApp2.Controllers
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
-            {
                 try
                 {
                     _context.Update(task);
@@ -122,9 +116,9 @@ namespace TestApp2.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
-            ViewData["TaskCreaterID"] = new SelectList(_context.Users, "UserID", "UserID", task.TaskCreaterID);
-            ViewData["TaskWorkerID"] = new SelectList(_context.Users, "UserID", "UserID", task.TaskWorkerID);
+       
+            ViewData["TaskCreaterID"] = new SelectList(_context.Users, "UserID", "Name", task.TaskCreaterID);
+            ViewData["TaskWorkerID"] = new SelectList(_context.Users, "UserID", "Name", task.TaskWorkerID);
             return View(task);
         }
 

@@ -1,26 +1,84 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using TestApp2.Interfaces;
+using TestApp2.DAL;
 using TestApp2.Models;
 
 namespace TestApp2.Controllers
 {
     public class UserController : Controller
     {
-        private readonly IMainDbContext _context;
+        private readonly MainContext _context;
 
-        public UserController(IMainDbContext context)
+        public UserController(MainContext context)
         {
             _context = context;
         }
 
         // GET: User
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+    string sortOrder,
+    string currentFilter,
+    string searchString,
+    int? pageNumber)
         {
-            return _context.Users != null ?
-                        View(await _context.Users.ToListAsync()) :
-                        Problem("Entity set 'MainContext.Users'  is null.");
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            var users = from s in _context.Users
+                           select s;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                users = users.Where(s => s.Name.Contains(searchString)
+                                       || s.Surname.Contains(searchString));
+            }
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    users = users.OrderByDescending(s => s.Name);
+                    break;
+                case "Date":
+                    users = users.OrderBy(s => s.DateOfCreation);
+                    break;
+                case "date_desc":
+                    users = users.OrderByDescending(s => s.DateOfCreation);
+                    break;
+                default:
+                    users = users.OrderBy(s => s.Name);
+                    break;
+            }
+
+            int pageSize = 5;
+            return View(await PaginatedList<User>.CreateAsync(users.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
+
+
+
+
+
+
+        //public async Task<IActionResult> Index()
+        //{
+        //    return _context.Users != null ?
+        //                View(await _context.Users.ToListAsync()) :
+        //                Problem("Entity set 'MainContext.Users'  is null.");
+        //}
 
         // GET: User/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -54,10 +112,11 @@ namespace TestApp2.Controllers
         public async Task<IActionResult> Create([Bind("UserID,Name,Surname,DateOfCreation,DateOfModification,Status")] User user)
         {
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                _context.Add(user);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
 
+            return View(user);
         }
 
         // GET: User/Edit/5
@@ -73,6 +132,7 @@ namespace TestApp2.Controllers
             {
                 return NotFound();
             }
+            user.Status = Status.active;
             return View(user);
         }
 
@@ -87,24 +147,26 @@ namespace TestApp2.Controllers
             {
                 return NotFound();
             }
-
-            try
-            {
-                _context.Users.Update(user);
+                try
+                {
+                _context.Update(user);
+                user.DateOfModification = DateTime.Now;
+                user.Status = Status.active;
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(user.UserID))
-                {
-                    return NotFound();
                 }
-                else
+                catch (DbUpdateConcurrencyException)
                 {
-                    throw;
+                    if (!UserExists(user.UserID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
-            }
             return RedirectToAction(nameof(Index));
+            return View(user);
         }
 
         // GET: User/Delete/5
@@ -139,14 +201,14 @@ namespace TestApp2.Controllers
             {
                 _context.Users.Remove(user);
             }
-
+            
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool UserExists(int id)
         {
-            return (_context.Users?.Any(e => e.UserID == id)).GetValueOrDefault();
+          return (_context.Users?.Any(e => e.UserID == id)).GetValueOrDefault();
         }
     }
 }

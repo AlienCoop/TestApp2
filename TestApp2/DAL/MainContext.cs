@@ -64,3 +64,6 @@ namespace TestApp2.DAL
         }
     }
 }
+
+
+//dropcreatedatabasealways<>
