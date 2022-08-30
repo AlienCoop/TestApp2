@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TestApp2.Models.Task>
+﻿@model PaginatedList<TestApp2.Models.Task>
 
 @{
     ViewData["Title"] = "Index";
@@ -9,35 +9,53 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find Task Worker: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="Index">Back to Full List</a>
+        </p>
+    </div>
+</form>
+
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find Task Creater: <input type="text" name="SearchString2" value="@ViewData["CurrentFilter2"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+        </p>
+    </div>
+</form>
+
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+               Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+               Description
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreatedDate)
+              <a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Date of Creation</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UpdatedDate)
+              Date Of Modification
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TaskStatus)
+              Task Creater
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TaskCreater)
+             <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Task Worker</a>
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TaskWorker)
-            </th>
-            <th></th>
+            <th>Task Status</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
@@ -52,13 +70,13 @@
                 @Html.DisplayFor(modelItem => item.UpdatedDate)
             </td>
             <td>
+                @(item.TaskCreater.Name + " " + item.TaskCreater.Surname)
+             </td>
+             <td>
+                @(item.TaskWorker.Name + " " + item.TaskWorker.Surname)
+            </td>
+             <td>
                 @Html.DisplayFor(modelItem => item.TaskStatus)
-            </td>
-            <td>
-               @(item.TaskCreater.Name + " " + item.TaskCreater.Surname)
-            </td>
-            <td>
-                @(item.TaskWorker.Name + " " + item.TaskCreater.Surname)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.TaskID">Edit</a> |
@@ -66,9 +84,28 @@
                 <a asp-action="ChangeTaskStatus" asp-route-id="@item.TaskID">Change Task Status</a> |
                 <a asp-action="ChangeTaskCreater" asp-route-id="@item.TaskID">Change Task Creater</a> |
                 <a asp-action="Delete" asp-route-id="@item.TaskID">Delete</a>
-
             </td>
         </tr>
 }
     </tbody>
 </table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

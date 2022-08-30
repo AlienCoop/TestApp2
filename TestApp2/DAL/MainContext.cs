@@ -15,6 +15,7 @@ namespace TestApp2.DAL
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Task> Tasks { get; set; }
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(entity =>

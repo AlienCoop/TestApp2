@@ -22,10 +22,10 @@ namespace TestApp2.Controllers
 
 
         public async Task<IActionResult> Index(
-    string sortOrder,
-    string currentFilter,
-    string searchString,
-    int? pageNumber)
+            string sortOrder,
+            string currentFilter,
+            string searchString,
+            int? pageNumber)
         {
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -65,7 +65,7 @@ namespace TestApp2.Controllers
                     break;
             }
 
-            int pageSize = 5;
+            int pageSize = 10;
             return View(await PaginatedList<User>.CreateAsync(users.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
